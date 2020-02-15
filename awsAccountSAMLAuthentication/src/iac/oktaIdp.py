@@ -39,9 +39,3 @@ class OktaSetup:
                                      )
 
         return okta_aws_app
-
-    def retrieve_aws_app(self):
-        existing_okta_aws_app = okta.app.Saml.get(os.getenv("OKTA_AWS_OIN_APP_RES_NAME"),
-                                                  os.getenv("OKTA_AWS_ID"))
-
-        return existing_okta_aws_app
