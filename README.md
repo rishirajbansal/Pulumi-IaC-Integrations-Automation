@@ -70,8 +70,8 @@ Pulumi template need to execute again to update the Okta AWS App with the ARNs o
 In the Pulumi project, open the environment configuration file and  update property AWS_IAM_SAML_PROVIDER_ARN and AWS_IAM_SAML_ROLE_OKTA_ARN with the ARNs values copied in above step.
 
 ```
-AWS_IAM_SAML_PROVIDER_ARN = arn:aws:iam::659051841213:saml-provider/NuageOkta001
-AWS_IAM_SAML_ROLE_OKTA_ARN = arn:aws:iam::659051841213:role/OktaRoleForSAMLAccess
+AWS_IAM_SAML_PROVIDER_ARN = arn:aws:iam::859051841213:saml-provider/NuageOkta001
+AWS_IAM_SAML_ROLE_OKTA_ARN = arn:aws:iam::859051841213:role/OktaRoleForSAMLAccess
 ```
 
 Run the pulumi template from the same terminal used in Step 1:
