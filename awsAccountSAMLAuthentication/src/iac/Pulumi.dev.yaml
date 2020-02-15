@@ -1,0 +1,7 @@
+config:
+  aws:profile: nauge
+  aws:region: us-east-1
+  okta:apiToken: 000zjuI4lLJ7KeAIxjzgce8x3B-eVjfZLde_GI5sIj
+  # okta:apiKey: 000zjuI4lLJ7KeAIxjzgce8x3B-eVjfZLde_GI5sIj
+  okta:baseUrl: okta.com
+  okta:orgName: dev-433222
