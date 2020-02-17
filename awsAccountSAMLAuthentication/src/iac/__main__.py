@@ -8,7 +8,6 @@ import os
 
 import pulumi
 
-from aws import IAMSetup
 from generic.init.initConfigurator import InitConfigurator
 from iamSamlConfigurator import IAMSamlConfigurator, IAMSamlConfiguratorArgs
 from oktaIdp import OktaSetup
@@ -26,7 +25,6 @@ flag = init_config.initialize()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 oktaSetup = OktaSetup()
-awsSetup = IAMSetup()
 
 okta_aws_app = None
 iam_saml_provider = None
