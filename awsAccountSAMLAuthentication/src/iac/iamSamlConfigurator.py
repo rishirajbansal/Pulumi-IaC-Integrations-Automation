@@ -4,31 +4,35 @@
  * Developed in: February 2020
  *
 """
+
 import json
 import os
-
 import pulumi
 import pulumi_aws as aws
+from pulumi import ResourceOptions, ComponentResource
 
 
-class IAMSetup:
+class IAMSamlConfiguratorArgs:
+    def __init__(
+            self,
+            okta_saml_metadata: str
+    ):
+        self.okta_saml_metadata = okta_saml_metadata
 
-    def create_iam_saml_provider(self, okta_aws_app, okta_saml_metadata):
+
+class IAMSamlConfigurator(ComponentResource):
+    def __init__(self, name: str, args: IAMSamlConfiguratorArgs, opts: ResourceOptions = None):
+        super().__init__("custom:app:IAMSamlConfigurator", name, {}, opts)
+
+        child_opts = ResourceOptions(parent=self, depends_on=opts.depends_on)
+
         iam_saml_provider = aws.iam.SamlProvider(os.getenv("AWS_IAM_SAML_PROVIDER_RES_NAME"),
                                                  name=os.getenv("AWS_IAM_SAML_PROVIDER_NAME"),
-                                                 saml_metadata_document=okta_saml_metadata,
-                                                 opts=pulumi.ResourceOptions(
-                                                     depends_on=[
-                                                         okta_aws_app
-                                                     ]
-                                                 )
+                                                 saml_metadata_document=args.okta_saml_metadata,
+                                                 opts=child_opts,
                                                  )
 
-        return iam_saml_provider
-
-    def create_iam_saml_role_okta(self, iam_saml_provider, iam_saml_provider_arn):
-
-        role_policy = iam_saml_provider_arn.apply(lambda arn: json.dumps({
+        role_policy = iam_saml_provider.arn.apply(lambda arn: json.dumps({
                                                                 "Version": "2012-10-17",
                                                                 "Statement": [
                                                                     {
@@ -58,17 +62,19 @@ class IAMSetup:
                                           )
                                           )
 
-        return iam_saml_role_okta
+        # Attach Admin access policy to IAM Role
+        if os.getenv("ENABLE_ADMIN_ACCESS_ON_ROLE") == 'Yes':
+            role_policy_attach = aws.iam.RolePolicyAttachment(os.getenv("AWS_IAM_ADMIN_POLICY_RES_NAME"),
+                                                              policy_arn='arn:aws:iam::aws:policy/AdministratorAccess',
+                                                              role=os.getenv("AWS_IAM_SAML_ROLE_OKTA_NAME"),
+                                                              opts=pulumi.ResourceOptions(
+                                                                  depends_on=[
+                                                                      iam_saml_role_okta
+                                                                  ]
+                                                              )
+                                                              )
 
-    def attach_role_policy_adminaccess(self, iam_saml_role_okta):
-        role_policy_attach = aws.iam.RolePolicyAttachment(os.getenv("AWS_IAM_ADMIN_POLICY_RES_NAME"),
-                                                          policy_arn='arn:aws:iam::aws:policy/AdministratorAccess',
-                                                          role=os.getenv("AWS_IAM_SAML_ROLE_OKTA_NAME"),
-                                                          opts=pulumi.ResourceOptions(
-                                                              depends_on=[
-                                                                  iam_saml_role_okta
-                                                              ]
-                                                          )
-                                                          )
+        self.iam_saml_provider_arn = iam_saml_provider.arn.apply(lambda arn: arn)
+        self.iam_role_urn = iam_saml_role_okta.arn.apply(lambda arn: arn)
 
-        return role_policy_attach
+        self.register_outputs({})

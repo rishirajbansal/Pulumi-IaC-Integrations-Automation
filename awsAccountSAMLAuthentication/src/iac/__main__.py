@@ -10,6 +10,7 @@ import pulumi
 
 from aws import IAMSetup
 from generic.init.initConfigurator import InitConfigurator
+from iamSamlConfigurator import IAMSamlConfigurator, IAMSamlConfiguratorArgs
 from oktaIdp import OktaSetup
 
 
@@ -45,20 +46,21 @@ else:
     # Create Okta AWS OIN App
     okta_aws_app = oktaSetup.create_aws_app()
 
-# Create Identity Provider in AWS
-iam_saml_provider = awsSetup.create_iam_saml_provider(okta_aws_app, okta_aws_app.metadata)
-
-# Create IAM Role and associate Identity Provider
-iam_saml_role_okta = awsSetup.create_iam_saml_role_okta(iam_saml_provider, iam_saml_provider.arn)
-
-# Attach Admin access policy to IAM Role
-if os.getenv("ENABLE_ADMIN_ACCESS_ON_ROLE") == 'Yes':
-    role_policy_attach = awsSetup.attach_role_policy_adminaccess(iam_saml_role_okta)
+# Create and Configure IAM Settings in AWS
+iam_saml_configurator = IAMSamlConfigurator("Okta_IAMSAMLConfigurator",
+                                            IAMSamlConfiguratorArgs(
+                                                okta_saml_metadata=okta_aws_app.metadata
+                                            ),
+                                            opts=pulumi.ResourceOptions(
+                                                 depends_on=[
+                                                     okta_aws_app
+                                                 ]
+                                            )
+                                            )
 
 # Details of Infrastructure Setup on AWS and Okta
 
-# pulumi.export('AWS SAML APP ID     => ', okta_aws_app.id)
-pulumi.export('AWS IAM SAML Provider ARN     => ', iam_saml_provider.arn)
-pulumi.export('AWS IAM Okta Role ARN     => ', iam_saml_role_okta.arn)
+pulumi.export('AWS IAM SAML Provider ARN        => ', iam_saml_configurator.iam_saml_provider_arn)
+pulumi.export('AWS IAM Okta Role ARN            => ', iam_saml_configurator.iam_role_urn)
 
 
