@@ -4,45 +4,24 @@
  * Developed in: February 2020
  *
 """
-import os
 
 import pulumi
 
-from generic.init.initConfigurator import InitConfigurator
 from iamSamlConfigurator import IAMSamlConfigurator, IAMSamlConfiguratorArgs
-from oktaIdp import OktaSetup
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Intialize basic configuration of project
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-init_config = InitConfigurator()
-flag = init_config.initialize()
+from oktaIdp import OktaSetup, OktaSetupArgs
+from config import *
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # IaC setup
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-oktaSetup = OktaSetup()
 
-okta_aws_app = None
-iam_saml_provider = None
-iam_saml_role_okta = None
-is_okta_app_exists = None
-
-# Check if Okta App is already existed
-if os.getenv("AWS_IAM_SAML_PROVIDER_ARN") == 'NONE' or os.getenv("AWS_IAM_SAML_ROLE_OKTA_ARN") == 'NONE':
-    is_okta_app_exists = False
-else:
-    is_okta_app_exists = True
-
-if is_okta_app_exists:
-    # Update previously created Okta OIN AWS App with IAM settings
-    okta_aws_app = oktaSetup.update_aws_app(os.getenv("AWS_IAM_SAML_PROVIDER_ARN"), os.getenv("AWS_IAM_SAML_ROLE_OKTA_ARN"))
-else:
-    # Create Okta AWS OIN App
-    okta_aws_app = oktaSetup.create_aws_app()
+okta_aws_app = OktaSetup("OktaSetup",
+                         OktaSetupArgs(
+                            iam_saml_provider_arn=AWS_IAM_SAML_PROVIDER_ARN,
+                            iam_role_urn=AWS_IAM_SAML_ROLE_OKTA_ARN
+                         )
+                         )
 
 # Create and Configure IAM Settings in AWS
 iam_saml_configurator = IAMSamlConfigurator("Okta_IAMSAMLConfigurator",
@@ -60,5 +39,4 @@ iam_saml_configurator = IAMSamlConfigurator("Okta_IAMSAMLConfigurator",
 
 pulumi.export('AWS IAM SAML Provider ARN        => ', iam_saml_configurator.iam_saml_provider_arn)
 pulumi.export('AWS IAM Okta Role ARN            => ', iam_saml_configurator.iam_role_urn)
-
 

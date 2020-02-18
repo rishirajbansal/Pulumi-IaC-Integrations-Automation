@@ -5,37 +5,69 @@
  *
 """
 import json
-import os
 
 import pulumi
 import pulumi_okta as okta
+from pulumi import ResourceOptions, ComponentResource
+
+from config import *
 
 
-class OktaSetup:
+class OktaSetupArgs:
+    """
+    Class for providing arguements to Compoment resource
 
-    def create_aws_app(self):
-        okta_aws_app = okta.app.Saml(os.getenv("OKTA_AWS_OIN_APP_RES_NAME"),
-                                    label=os.getenv("OKTA_AWS_OIN_APP_NAME"),
-                                    preconfigured_app='amazon_aws'
-                                    )
+    Attributes:
+        okta_saml_metadata (str): Metadata xml received from Okta AWS App
+    """
 
-        return okta_aws_app
+    def __init__(
+            self,
+            iam_saml_provider_arn: str,
+            iam_role_urn: str
+    ):
+        """
+        The constructor for IAMSamlConfiguratorArgs class
+        :param iam_saml_provider_arn: ARN Value of IAM SAML Provider
+        :param iam_role_urn: ARN Value of IAM Role
+        """
 
-    def update_aws_app(self, iam_saml_provider_arn, iam_saml_role_okta_arn):
-        identity_provider_arn = "{0},{1}".format(iam_saml_role_okta_arn, iam_saml_provider_arn)
+        self.iam_saml_provider_arn = iam_saml_provider_arn
+        self.iam_role_urn = iam_role_urn
 
-        app_settings_json = {
-                                "identityProviderArn": identity_provider_arn,
-                                "awsEnvironmentType": "aws.amazon",
-                                "sessionDuration": 3600,
-                                "joinAllRoles": True
-                            }
 
-        okta_aws_app = okta.app.Saml(os.getenv("OKTA_AWS_OIN_APP_RES_NAME"),
-                                     label=os.getenv("OKTA_AWS_OIN_APP_NAME"),
+class OktaSetup(ComponentResource):
+    """
+    Component Resource for Okta OIN AWS App Configuration.
+
+    This class creates Okta OIN based AWS Application with SAML authentication.
+    """
+
+    def __init__(self, name: str, args: OktaSetupArgs, opts: ResourceOptions = None):
+        """
+
+        :param name: Unique name for the Component Resource Class
+        :param args: Information passed to [initialize] method
+        :param opts: Options that control this resource's behavior
+        """
+        super().__init__("custom:app:OktaSetup", name, {}, opts)
+
+        child_opts = ResourceOptions(parent=self)
+
+        identity_provider_arn = "{0},{1}".format(args.iam_role_urn, args.iam_saml_provider_arn)
+
+        okta_aws_app = okta.app.Saml(OKTA_AWS_OIN_APP_RES_NAME,
+                                     label=OKTA_AWS_OIN_APP_NAME,
                                      preconfigured_app='amazon_aws',
-                                     app_settings_json=json.dumps(app_settings_json),
+                                     app_settings_json=json.dumps({
+                                         "identityProviderArn": identity_provider_arn,
+                                         "awsEnvironmentType": "aws.amazon",
+                                         "sessionDuration": 3600,
+                                         "joinAllRoles": True
+                                     }),
                                      subject_name_id_format='urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
                                      )
 
-        return okta_aws_app
+        self.metadata = okta_aws_app.metadata.apply(lambda metadata: metadata)
+
+        self.register_outputs({})
