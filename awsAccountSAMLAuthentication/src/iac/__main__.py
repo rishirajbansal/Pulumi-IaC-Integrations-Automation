@@ -4,6 +4,7 @@
  * Developed in: February 2020
  *
 """
+import os
 
 import pulumi
 
@@ -11,10 +12,10 @@ from iamSamlConfigurator import IAMSamlConfigurator, IAMSamlConfiguratorArgs
 from oktaIdp import OktaSetup, OktaSetupArgs
 from config import *
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # IaC setup
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 okta_aws_app = OktaSetup("OktaSetup",
                          OktaSetupArgs(
@@ -39,4 +40,3 @@ iam_saml_configurator = IAMSamlConfigurator("Okta_IAMSAMLConfigurator",
 
 pulumi.export('AWS IAM SAML Provider ARN        => ', iam_saml_configurator.iam_saml_provider_arn)
 pulumi.export('AWS IAM Okta Role ARN            => ', iam_saml_configurator.iam_role_urn)
-
