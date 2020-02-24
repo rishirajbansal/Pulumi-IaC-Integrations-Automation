@@ -8,27 +8,6 @@ The objective of the project is to allow users to securely login into the AWS ac
 
 Certain IAM Role can be associated with the account access with the required privileges. These privileges can be controlled from IAM Policies. Multiple IAM Policies can be associated with single IAM Role, hence providing an isolated layers of access which can be turned on/off. Each policy can be centralized around one AWS service or multiple. 
 
-#### Directory Structure
-```
-.
-|   requirements.txt
-|   
-+---envs
-|       .env.development
-|       .env.production
-|       
-\---iac
-    |   aws.py
-    |   oktaIdp.py
-    |   Pulumi.dev.yaml
-    |   Pulumi.yaml
-    |   __main__.py
-    |   
-    +---generic
-    |   \---init
-    |       |   initConfigurator.py
-```
-
 #### Pulumi Project Setup
 
 Prerequisites: Python v 3.6.x or later already installed.
