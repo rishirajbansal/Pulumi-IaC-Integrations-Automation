@@ -40,3 +40,6 @@ Follow this document to create Okta OIN AWS app with base properties and its oth
 
 This completes Application Deployment Workflow.
 
+#### Resource Diagram
+
+[Resource Diagram](https://github.com/rishirajbansal/Pulumi-IaC-Integrations-Automation/blob/master/awsAccountSAMLAuthentication/documents/ResourceDiagram.png)
