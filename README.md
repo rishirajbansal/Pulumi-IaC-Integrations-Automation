@@ -34,32 +34,9 @@ Following steps are needed to install the Pulumi application successfully:
 
 After setting up projects and setting up Pulumi as mentioned in the above section, this section is used to follow the steps to make application work in union with its all distinct components integrated and configured.
 
-Following steps need to be executed to complete Deployment Workflow:
+Follow this document to create Okta OIN AWS app with base properties and its other component.
 
-###### 1.	[Create Infrastructure Stack by Pulumi](awsAccountSAMLAuthentication/documents/Nuage%20-%20Pulumi%20IaC%20Integrations%20Automation%20-%20Technical%20Specification.pdf)
-
-This will create Okta OIN AWS app with base properties and its other components. At this moment, Pulumi need Okta’s app metadata details to associate them with IAM Identity Provider and Role creations.
-
-Copy down the AWS IAM SAML Provider ARN and AWS IAM Okta Role ARN generated as the output from the Pulumi template as this is required in next step.
-
-###### 2.	Rerun the Pulumi template
-
-Pulumi template need to execute again to update the Okta AWS App with the ARNs of IAM Identity Provider and Role generated in above step. 
-
-In the Pulumi project, open the environment configuration file and  update property AWS_IAM_SAML_PROVIDER_ARN and AWS_IAM_SAML_ROLE_OKTA_ARN with the ARNs values copied in above step.
-
-```
-AWS_IAM_SAML_PROVIDER_ARN = arn:aws:iam::859051841213:saml-provider/NuageOkta001
-AWS_IAM_SAML_ROLE_OKTA_ARN = arn:aws:iam::859051841213:role/OktaRoleForSAMLAccess
-```
-
-Run the pulumi template from the same terminal used in Step 1:
-
-```
-$ pulumi up -y
-```
-
-This will update the Okta AWS app’s Sign On settings with AWS IAM associations.
+[Create Infrastructure Stack by Pulumi](awsAccountSAMLAuthentication/documents/Nuage%20-%20Pulumi%20IaC%20Integrations%20Automation%20-%20Technical%20Specification.pdf)
 
 This completes Application Deployment Workflow.
 
