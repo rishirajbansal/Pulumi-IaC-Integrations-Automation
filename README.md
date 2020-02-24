@@ -42,4 +42,4 @@ This completes Application Deployment Workflow.
 
 #### Resource Diagram
 
-[Resource Diagram](https://github.com/rishirajbansal/Pulumi-IaC-Integrations-Automation/blob/master/awsAccountSAMLAuthentication/documents/ResourceDiagram.png)
+![Resource Diagram](/awsAccountSAMLAuthentication/documents/ResourceDiagram.png)
