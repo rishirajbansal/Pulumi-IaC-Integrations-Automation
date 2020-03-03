@@ -50,6 +50,7 @@ class AWSSAMLValidationProvider(ResourceProvider):
         return CreateResult(id_="AWSSAMLValidation", outs={})
 
     def update(self, id, _olds, props):
+
         identity_provider_arn = "{0},{1}".format(props["iam_role_urn"], props["iam_saml_provider_arn"])
 
         status, data = self.post_appupdate_endpoint_request(props["appid"], identity_provider_arn)
