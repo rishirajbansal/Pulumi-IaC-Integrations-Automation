@@ -138,6 +138,7 @@ class GAuth:
 
         elif request_type == API_REQUEST_TYPE_SAML_SIGNKEY:
             atom_xml_string = self.file_to_string("config/samlCertAtomPub.xml")
+            atom_xml_string = atom_xml_string.replace("{DOMAIN_NAME}", DOMAIN_NAME)
 
             encoded_cert = b64encode(bytes(cert, "utf-8")).decode("ascii")
             atom_xml_string = atom_xml_string.replace("{CERT}", encoded_cert)
